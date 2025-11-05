@@ -1,0 +1,21 @@
+﻿﻿@using GestionF1.Data.Entidades
+@model PilotoViewModel
+
+<form asp-action="AgregarPiloto" method="post">
+    <div class="form-group">
+        <label for="NombreCompleto">Nombre del Piloto</label>
+        <input type="text" class="form-control" id="NombreCompleto" asp-for="NombrePiloto" />
+    </div>
+    <div class="form-group">
+        <label for="NombreEscuderia">Escuderia</label>
+        <select class="form-control" id="Escuderia" asp-for="IdEscuderia">
+            <option selected disabled value="">Seleccionar Escuderia</option>
+
+            @foreach (Escuderium Escuderia in Model.EscuderiasDisponibles)
+            {
+                <option value="@Escuderia.IdEscuderia">@Escuderia.NombreEscuderia</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar</button>
+</form>

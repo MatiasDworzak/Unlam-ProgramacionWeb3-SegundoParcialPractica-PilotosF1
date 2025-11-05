@@ -1,0 +1,35 @@
+﻿﻿@using GestionF1.Data.Entidades
+@model List<Piloto>
+
+<form method="post" asp-action="FiltrarPorEscuderia">
+    <div class="form-group">
+        <label for="EscuderiaSelect">Filtrar por Escuderia:</label>
+        <select id="EscuderiaSelect" name="IdEscuderia" class="form-control">
+            @foreach (Escuderium Escuderia in ViewBag.Escuderias)
+            {
+                <option value="@Escuderia.IdEscuderia">@Escuderia.NombreEscuderia</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Escuderia</th>
+            <th>Accion</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var Piloto in Model)
+        {
+            <tr>
+                <td>@Piloto.NombrePiloto</td>
+                <td>@Piloto.IdEscuderiaNavigation.NombreEscuderia</td>
+                <td><a asp-controller="Pilotos" asp-action="EliminarPiloto" asp-route-idPiloto="@Piloto.IdPiloto">Eliminar</a></td>
+            </tr>
+        }
+    </tbody>
+</table> 
