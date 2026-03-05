@@ -19,22 +19,7 @@ public partial class GestionF1Context : DbContext
 
     public virtual DbSet<Piloto> Pilotos { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server =DESKTOP-AEPEPKG\\SQLEXPRESS; Database=GestionF1; Trusted_Connection= True; TrustServerCertificate=True");
-    static string GetHerokuConnectionString()
-{
-    // Railway usa el mismo formato de URL que Heroku
-    string connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-
-    if (string.IsNullOrEmpty(connectionUrl))
-        return null;
-
-    var databaseUri = new Uri(connectionUrl);
-    var userInfo = databaseUri.UserInfo.Split(':');
-
-    return $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.Substring(1)};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
-}
+  
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Escuderium>(entity =>
