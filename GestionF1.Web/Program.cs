@@ -4,11 +4,29 @@ using GestionF1.Servicio;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// 1. Al principio del archivo, agregá este método para parsear la URL de Railway
+static string GetConnectionString(IConfiguration config)
+{
+    var connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+    if (string.IsNullOrEmpty(connectionUrl))
+        return config.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<GestionF1Context>(options =>options.UseNpgsql
-(builder.Configuration.GetConnectionString("DefaultConnection")));
+    var databaseUri = new Uri(connectionUrl);
+    var userInfo = databaseUri.UserInfo.Split(':');
+
+    return $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.Substring(1)};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+}
+
+// 2. Configurá el puerto dinámico (Vital para que Railway no te dé error de timeout)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
+
+// 3. Registrá el Contexto usando Npgsql (Postgres)
+var connectionString = GetConnectionString(builder.Configuration);
+builder.Services.AddDbContext<GestionF1Context>(options =>
+    options.UseNpgsql(connectionString));
+
 
 builder.Services.AddScoped<IPilotoServicio, PilotoServicio>();
 builder.Services.AddScoped<IEscuderiasServicio, EscuderiasServicio>();
@@ -35,3 +53,18 @@ app.MapControllerRoute(
     pattern: "{controller=Pilotos}/{action=ListadoPilotos}/{id?}");
 
 app.Run();
+
+
+static string GetHerokuConnectionString()
+{
+    // Railway usa el mismo formato de URL que Heroku
+    string connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+    if (string.IsNullOrEmpty(connectionUrl))
+        return null;
+
+    var databaseUri = new Uri(connectionUrl);
+    var userInfo = databaseUri.UserInfo.Split(':');
+
+    return $"Host={databaseUri.Host};Port={databaseUri.Port};Database={databaseUri.LocalPath.Substring(1)};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+}
